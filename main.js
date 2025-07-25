@@ -55,7 +55,7 @@ const randomImages = [
 const streamingUrls = {
     iptv: 'https://www.youtube.com/embed/jfKfPfyJRdk', // Cambia esta URL por la que desees
     deportes: 'https://www.youtube.com/embed/jfKfPfyJRdk', // Cambia esta URL por la que desees
-    envivos: 'https://www.youtube.com/embed/jfKfPfyJRdk' // Cambia esta URL por la que desees
+    envivos: 'https://kick.com/samulx' // Cambia esta URL por la que desees
 };
 
 // Sample business data for demonstration
@@ -449,6 +449,65 @@ document.addEventListener('click', function(e) {
 
 // Add loading animation for images
 document.addEventListener('DOMContentLoaded', function() {
+    // Deshabilitar menú contextual en las transmisiones
+    document.addEventListener('contextmenu', function(e) {
+        const streamingContainers = [
+            'iptvPlayer', 'deportesPlayer', 'envivosPlayer',
+            'iptv-player-container', 'deportes-player-container', 'envivos-player-container',
+            'iframe-overlay'
+        ];
+        
+        if (streamingContainers.some(id => 
+            e.target.id === id || 
+            e.target.closest(`#${id}`) || 
+            e.target.closest(`.${id}`) ||
+            e.target.classList.contains('iframe-overlay')
+        )) {
+            e.preventDefault();
+            return false;
+        }
+    });
+    
+    // Deshabilitar teclas de desarrollador solo en páginas de transmisión
+    document.addEventListener('keydown', function(e) {
+        const streamingPages = ['iptvPage', 'deportesPage', 'envivosPage'];
+        const currentPage = document.querySelector('.page.active');
+        
+        if (currentPage && streamingPages.includes(currentPage.id)) {
+            // Solo bloquear teclas de desarrollador, no navegación
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) ||
+                (e.ctrlKey && (e.key === 'u' || e.key === 'U'))) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        }
+    });
+    
+    // Protección adicional en pantalla completa
+    document.addEventListener('fullscreenchange', function() {
+        if (document.fullscreenElement) {
+            // Solo bloquear en elementos de transmisión
+            const streamingElements = document.querySelectorAll('.iptv-player, .deportes-player, .envivos-player');
+            streamingElements.forEach(el => {
+                el.style.userSelect = 'none';
+                el.style.webkitUserSelect = 'none';
+                el.style.mozUserSelect = 'none';
+                el.style.msUserSelect = 'none';
+            });
+        } else {
+            // Restaurar cuando sale de pantalla completa
+            const streamingElements = document.querySelectorAll('.iptv-player, .deportes-player, .envivos-player');
+            streamingElements.forEach(el => {
+                el.style.userSelect = '';
+                el.style.webkitUserSelect = '';
+                el.style.mozUserSelect = '';
+                el.style.msUserSelect = '';
+            });
+        }
+    });
+    
     const images = document.querySelectorAll('.card-image');
     
     images.forEach(img => {
@@ -506,8 +565,16 @@ function setupIPTVPage() {
             height="100%" 
             frameborder="0" 
             allowfullscreen
-            allow="autoplay; encrypted-media">
+            allow="autoplay; encrypted-media"
+            style="pointer-events: none; user-select: none;"
+            oncontextmenu="return false;"
+            onmousedown="return false;"
+            onselectstart="return false;"
+            ondragstart="return false;"
+            controlsList="nodownload noremoteplayback"
+            disablePictureInPicture>
         </iframe>
+        <div class="iframe-overlay" oncontextmenu="return false;"></div>
     `;
 }
 
@@ -521,8 +588,16 @@ function setupDeportesPage() {
             height="100%" 
             frameborder="0" 
             allowfullscreen
-            allow="autoplay; encrypted-media">
+            allow="autoplay; encrypted-media"
+            style="pointer-events: none; user-select: none;"
+            oncontextmenu="return false;"
+            onmousedown="return false;"
+            onselectstart="return false;"
+            ondragstart="return false;"
+            controlsList="nodownload noremoteplayback"
+            disablePictureInPicture>
         </iframe>
+        <div class="iframe-overlay" oncontextmenu="return false;"></div>
     `;
 }
 
@@ -530,9 +605,13 @@ function setupDeportesPage() {
 function toggleFullscreen(elementId) {
     const element = document.getElementById(elementId);
     if (!document.fullscreenElement) {
-        element.requestFullscreen();
+        element.requestFullscreen().catch(err => {
+            console.log('Error al entrar en pantalla completa:', err);
+        });
     } else {
-        document.exitFullscreen();
+        document.exitFullscreen().catch(err => {
+            console.log('Error al salir de pantalla completa:', err);
+        });
     }
 }
 
@@ -546,8 +625,15 @@ function setupEnvivosPage() {
             height="100%" 
             frameborder="0" 
             allowfullscreen
-            allow="autoplay; encrypted-media">
+            allow="autoplay; encrypted-media"
+            style="pointer-events: none; user-select: none;"
+            oncontextmenu="return false;"
+            onmousedown="return false;"
+            onselectstart="return false;"
+            ondragstart="return false;"
+            controlsList="nodownload noremoteplayback"
+            disablePictureInPicture>
         </iframe>
+        <div class="iframe-overlay" oncontextmenu="return false;"></div>
     `;
-
 }
