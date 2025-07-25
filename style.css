@@ -1,4 +1,4 @@
-* {
+ {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -829,6 +829,18 @@ body {
     position: relative;
     background: #000;
     margin: 0 auto;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.iptv-player iframe {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: auto;
 }
 
 /* Deportes Styles */
@@ -852,6 +864,18 @@ body {
     position: relative;
     background: #000;
     margin: 0 auto;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.deportes-player iframe {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: auto;
 }
 
 .stream-placeholder {
@@ -924,6 +948,92 @@ body {
     position: relative;
     background: #000;
     margin: 0 auto;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.envivos-player iframe {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: auto;
+}
+
+/* Prevenir inspección de elementos en las transmisiones */
+.iptv-player-container,
+.deportes-player-container,
+.envivos-player-container {
+    position: relative;
+}
+
+/* Overlay para bloquear interacción directa con iframe */
+.iframe-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    z-index: 1;
+    pointer-events: auto;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Protección de los reproductores */
+.iptv-player,
+.deportes-player,
+.envivos-player {
+    position: relative;
+}
+
+/* Los iframes mantienen funcionalidad básica pero sin acceso directo */
+.iptv-player iframe,
+.deportes-player iframe,
+.envivos-player iframe {
+    pointer-events: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    position: relative;
+    z-index: 0;
+}
+
+/* Permitir que el botón de pantalla completa funcione */
+.fullscreen-btn {
+    position: relative;
+    z-index: 10;
+    pointer-events: auto !important;
+}
+
+/* Header siempre accesible */
+.player-header {
+    position: relative;
+    z-index: 10;
+    pointer-events: auto !important;
+}
+
+/* En pantalla completa, proteger solo el contenido del iframe */
+.iptv-player:-webkit-full-screen iframe,
+.deportes-player:-webkit-full-screen iframe,
+.envivos-player:-webkit-full-screen iframe,
+.iptv-player:-moz-full-screen iframe,
+.deportes-player:-moz-full-screen iframe,
+.envivos-player:-moz-full-screen iframe,
+.iptv-player:fullscreen iframe,
+.deportes-player:fullscreen iframe,
+.envivos-player:fullscreen iframe {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
 }
 
 /* Responsive for ENVIVOS */
