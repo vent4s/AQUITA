@@ -817,3 +817,117 @@ function handleChatKeyPress(event, chatType) {
         sendChatMessage(chatType);
     }
 }
+
+// ==================================
+//     LÓGICA DEL CHATBOT GEMINI
+// ==================================
+
+// --- Pega tu clave de API aquí ---
+const GEMINI_API_KEY = 'AIzaSyBVOvI5vBSqGXuNf9NSV2TjmOWY3GDTujc';
+
+// --- Elementos del DOM ---
+const chatButton = document.getElementById('gemini-chat-button');
+const chatWindow = document.getElementById('gemini-chat-window');
+const closeChatBtn = document.getElementById('close-chat-btn');
+const chatMessagesContainer = document.getElementById('chat-messages-gemini');
+const inputForm = document.getElementById('gemini-input-form');
+const chatInput = document.getElementById('gemini-chat-input');
+
+// --- Lógica para abrir y cerrar el chat ---
+chatButton.addEventListener('click', () => {
+    chatWindow.classList.toggle('show');
+});
+
+closeChatBtn.addEventListener('click', () => {
+    chatWindow.classList.remove('show');
+});
+
+// --- Función para añadir mensajes a la ventana de chat ---
+function addMessageToChat(message, sender) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
+    messageDiv.textContent = message;
+    chatMessagesContainer.appendChild(messageDiv);
+    // Hacer scroll para ver el último mensaje
+    chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+}
+
+// --- Función para mostrar el indicador de "escribiendo..." ---
+function showTypingIndicator() {
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'bot-message typing-indicator';
+    typingDiv.innerHTML = '<span></span><span></span><span></span>';
+    chatMessagesContainer.appendChild(typingDiv);
+    chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+}
+
+// --- Función para quitar el indicador de "escribiendo..." ---
+function removeTypingIndicator() {
+    const indicator = document.querySelector('.typing-indicator');
+    if (indicator) {
+        indicator.remove();
+    }
+}
+
+// --- Función principal para comunicarse con la API de Gemini ---
+async function getGeminiResponse(userInput) {
+    showTypingIndicator();
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+
+    const requestBody = {
+        // El "prompt del sistema" le da contexto y personalidad al bot.
+        "systemInstruction": {
+            "parts": {
+                "text": "Eres un asistente amigable y servicial para un directorio de negocios llamado 'DirectorioLocal'. Tu propósito es ayudar a los usuarios a encontrar información sobre las categorías y servicios que se ofrecen en la página. Responde de forma concisa y directa. No inventes negocios que no existen."
+            }
+        },
+        "contents": [{
+            "parts": [{
+                "text": userInput
+            }]
+        }]
+    };
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error en la API: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        // Extraemos el texto de la respuesta
+        const botResponse = data.candidates[0].content.parts[0].text;
+        
+        removeTypingIndicator();
+        addMessageToChat(botResponse, 'bot');
+
+    } catch (error) {
+        console.error('Error al contactar a Gemini:', error);
+        removeTypingIndicator();
+        addMessageToChat('Lo siento, algo salió mal. Por favor, inténtalo de nuevo más tarde.', 'bot');
+    }
+}
+
+
+// --- Manejar el envío del formulario de chat ---
+inputForm.addEventListener('submit', (e) => {
+    e.preventDefault(); // Evita que la página se recargue
+    const userInput = chatInput.value.trim();
+
+    if (userInput === '') {
+        return; // No enviar mensajes vacíos
+    }
+
+    addMessageToChat(userInput, 'user');
+    chatInput.value = ''; // Limpiar el campo de entrada
+
+    // Llamar a la función de Gemini para obtener una respuesta
+    getGeminiResponse(userInput);
+});
