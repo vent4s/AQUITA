@@ -1,6 +1,6 @@
 // Global state
 let currentCategory = '';
-let megaAccordionStates = Array(12).fill(false);
+let megaAccordionStates = Array(13).fill(false);
 let allCategoriesExpanded = false;
 
 // All categories and subcategories data
@@ -16,7 +16,8 @@ const categoriesData = {
     'Empresas': ['Mayoristas', 'Distribuidoras', 'Almacenes'],
     'Deliveris': ['Empresas Delivery', 'Sin empresas'],
     'Streamer': ['Tik tokers', 'IPTV', 'Deportes las gemelas'],
-    'Eventos': ['ENVIVOS']
+    'Eventos': ['ENVIVOS'],
+    'Vestir': ['Ropa', 'Calzado', 'Mixto']
 };
 
 // Icons for categories
@@ -32,7 +33,8 @@ const categoryIcons = {
     'Empresas': 'fas fa-building',
     'Deliveris': 'fas fa-truck',
     'Streamer': 'fas fa-video',
-    'Eventos': 'fas fa-calendar-alt'
+    'Eventos': 'fas fa-calendar-alt',
+    'Vestir': 'fas fa-tshirt'
 };
 
 // Random images for demonstration
@@ -66,7 +68,7 @@ const sampleBusinesses = [
     { name: 'Comercio Regional 4', description: 'Cuarto comercio regional con precios competitivos y calidad.' },
     { name: 'Tienda Principal 5', description: 'Quinta tienda principal con variedad y excelente ubicación.' },
     { name: 'Centro Comercial 6', description: 'Sexto centro comercial con múltiples opciones y facilidades.' },
-    { name: 'Almacén Central 7', description: 'Séptimo almacén central con distribución en toda la ciudad.' },
+    { name: 'cashea prueba 1', description: 'Plataforma digital de pagos y servicios financieros modernos.', specialIcon: 'cashea', website: 'https://www.cashea.app/' },
     { name: 'Negocio Familiar 8', description: 'Octavo negocio familiar con tradición y confianza de años.' }
 ];
 
@@ -397,26 +399,51 @@ function createBusinessCard(business, imageUrl, index) {
     const card = document.createElement('div');
     card.className = 'business-card';
     
+    // Determinar si es cashea para usar icono especial
+    const socialIcons = business.specialIcon === 'cashea' ? `
+        <a href="https://facebook.com" target="_blank" class="social-icon facebook" title="Facebook">
+            <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="https://instagram.com" target="_blank" class="social-icon instagram" title="Instagram">
+            <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://tiktok.com" target="_blank" class="social-icon tiktok" title="TikTok">
+            <i class="fab fa-tiktok"></i>
+        </a>
+        <a href="${business.website}" target="_blank" class="social-icon cashea" title="Cashea">
+            <i class="fas fa-credit-card"></i>
+        </a>
+    ` : `
+        <a href="https://facebook.com" target="_blank" class="social-icon facebook" title="Facebook">
+            <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="https://instagram.com" target="_blank" class="social-icon instagram" title="Instagram">
+            <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://tiktok.com" target="_blank" class="social-icon tiktok" title="TikTok">
+            <i class="fab fa-tiktok"></i>
+        </a>
+    `;
+    
+    const websiteUrl = business.website || `https://ejemplo.com/negocio-${index + 1}`;
+    
     card.innerHTML = `
         <div class="card-image" style="background-image: url('${imageUrl}')">
             <div class="social-icons">
-                <a href="https://facebook.com" target="_blank" class="social-icon facebook" title="Facebook">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="https://instagram.com" target="_blank" class="social-icon instagram" title="Instagram">
-                    <i class="fab fa-instagram"></i>
-                </a>
-                <a href="https://tiktok.com" target="_blank" class="social-icon tiktok" title="TikTok">
-                    <i class="fab fa-tiktok"></i>
-                </a>
+                ${socialIcons}
             </div>
         </div>
         <div class="card-content">
             <h3 class="card-title">${business.name}</h3>
             <p class="card-description">${business.description}</p>
-            <a href="https://ejemplo.com/negocio-${index + 1}" target="_blank" class="card-link">
-                Ver más información
-            </a>
+            <div class="card-buttons">
+                <a href="${websiteUrl}" target="_blank" class="card-button website-btn">
+                    <i class="fas fa-globe"></i> Website
+                </a>
+                <a href="https://maps.google.com/?q=empresa+${encodeURIComponent(business.name)}" target="_blank" class="card-button location-btn">
+                    <i class="fas fa-map-marker-alt"></i> Ubicación
+                </a>
+            </div>
         </div>
     `;
     
@@ -565,17 +592,53 @@ function setupIPTVPage() {
             height="100%" 
             frameborder="0" 
             allowfullscreen
-            allow="autoplay; encrypted-media"
-            style="pointer-events: none; user-select: none;"
-            oncontextmenu="return false;"
-            onmousedown="return false;"
-            onselectstart="return false;"
-            ondragstart="return false;"
-            controlsList="nodownload noremoteplayback"
-            disablePictureInPicture>
+            allow="autoplay; encrypted-media">
         </iframe>
-        <div class="iframe-overlay" oncontextmenu="return false;"></div>
     `;
+    
+    // Add chat container after the player container
+    const iptvContainer = document.querySelector('.iptv-container');
+    const existingChat = iptvContainer.querySelector('.chat-container');
+    if (existingChat) {
+        existingChat.remove();
+    }
+    
+    const chatContainer = document.createElement('div');
+    chatContainer.className = 'chat-container';
+    chatContainer.innerHTML = `
+        <div class="chat-header">
+            <i class="fas fa-comments"></i>
+            <span>Chat en Vivo</span>
+        </div>
+        <div class="chat-messages" id="iptvChatMessages">
+            <div class="chat-message">
+                <span class="chat-user">Usuario1:</span>
+                <span class="chat-text">¡Excelente transmisión!</span>
+            </div>
+            <div class="chat-message">
+                <span class="chat-user">Usuario2:</span>
+                <span class="chat-text">Muy buena calidad</span>
+            </div>
+            <div class="chat-message">
+                <span class="chat-user">StreamFan:</span>
+                <span class="chat-text">Me encanta este canal</span>
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="iptvChatInput" placeholder="Escribe tu mensaje..." onkeypress="handleChatKeyPress(event, 'iptv')">
+            <div class="chat-icons">
+                <i class="fas fa-smile" title="😊" onclick="addEmoji('😊', 'iptv')"></i>
+                <i class="fas fa-heart" title="❤️" onclick="addEmoji('❤️', 'iptv')"></i>
+                <i class="fas fa-thumbs-up" title="👍" onclick="addEmoji('👍', 'iptv')"></i>
+                <i class="fas fa-fire" title="🔥" onclick="addEmoji('🔥', 'iptv')"></i>
+            </div>
+            <button class="chat-send-btn" onclick="sendChatMessage('iptv')">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    `;
+    
+    iptvContainer.appendChild(chatContainer);
 }
 
 // Deportes Page Setup
@@ -588,17 +651,53 @@ function setupDeportesPage() {
             height="100%" 
             frameborder="0" 
             allowfullscreen
-            allow="autoplay; encrypted-media"
-            style="pointer-events: none; user-select: none;"
-            oncontextmenu="return false;"
-            onmousedown="return false;"
-            onselectstart="return false;"
-            ondragstart="return false;"
-            controlsList="nodownload noremoteplayback"
-            disablePictureInPicture>
+            allow="autoplay; encrypted-media">
         </iframe>
-        <div class="iframe-overlay" oncontextmenu="return false;"></div>
     `;
+    
+    // Add chat container after the player container
+    const deportesContainer = document.querySelector('.deportes-container');
+    const existingChat = deportesContainer.querySelector('.chat-container');
+    if (existingChat) {
+        existingChat.remove();
+    }
+    
+    const chatContainer = document.createElement('div');
+    chatContainer.className = 'chat-container';
+    chatContainer.innerHTML = `
+        <div class="chat-header">
+            <i class="fas fa-comments"></i>
+            <span>Chat Deportivo</span>
+        </div>
+        <div class="chat-messages" id="deportesChatMessages">
+            <div class="chat-message">
+                <span class="chat-user">Fanático1:</span>
+                <span class="chat-text">¡Qué golazo!</span>
+            </div>
+            <div class="chat-message">
+                <span class="chat-user">Deportista:</span>
+                <span class="chat-text">Excelente jugada</span>
+            </div>
+            <div class="chat-message">
+                <span class="chat-user">FutbolLover:</span>
+                <span class="chat-text">¡Vamos equipo!</span>
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="deportesChatInput" placeholder="Comenta sobre el juego..." onkeypress="handleChatKeyPress(event, 'deportes')">
+            <div class="chat-icons">
+                <i class="fas fa-futbol" title="⚽" onclick="addEmoji('⚽', 'deportes')"></i>
+                <i class="fas fa-trophy" title="🏆" onclick="addEmoji('🏆', 'deportes')"></i>
+                <i class="fas fa-fire" title="🔥" onclick="addEmoji('🔥', 'deportes')"></i>
+                <i class="fas fa-heart" title="❤️" onclick="addEmoji('❤️', 'deportes')"></i>
+            </div>
+            <button class="chat-send-btn" onclick="sendChatMessage('deportes')">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    `;
+    
+    deportesContainer.appendChild(chatContainer);
 }
 
 // Fullscreen functions
@@ -625,15 +724,98 @@ function setupEnvivosPage() {
             height="100%" 
             frameborder="0" 
             allowfullscreen
-            allow="autoplay; encrypted-media"
-            style="pointer-events: none; user-select: none;"
-            oncontextmenu="return false;"
-            onmousedown="return false;"
-            onselectstart="return false;"
-            ondragstart="return false;"
-            controlsList="nodownload noremoteplayback"
-            disablePictureInPicture>
+            allow="autoplay; encrypted-media">
         </iframe>
-        <div class="iframe-overlay" oncontextmenu="return false;"></div>
     `;
+    
+    // Add chat container after the player container
+    const envivosContainer = document.querySelector('.envivos-container');
+    const existingChat = envivosContainer.querySelector('.chat-container');
+    if (existingChat) {
+        existingChat.remove();
+    }
+    
+    const chatContainer = document.createElement('div');
+    chatContainer.className = 'chat-container';
+    chatContainer.innerHTML = `
+        <div class="chat-header">
+            <i class="fas fa-broadcast-tower"></i>
+            <span>Chat en Vivo</span>
+        </div>
+        <div class="chat-messages" id="envivosChatMessages">
+            <div class="chat-message">
+                <span class="chat-user">Espectador1:</span>
+                <span class="chat-text">¡Evento increíble!</span>
+            </div>
+            <div class="chat-message">
+                <span class="chat-user">Fan:</span>
+                <span class="chat-text">Muy buena transmisión</span>
+            </div>
+            <div class="chat-message">
+                <span class="chat-user">LiveViewer:</span>
+                <span class="chat-text">Saludos a todos!</span>
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="envivosChatInput" placeholder="Únete a la conversación..." onkeypress="handleChatKeyPress(event, 'envivos')">
+            <div class="chat-icons">
+                <i class="fas fa-star" title="⭐" onclick="addEmoji('⭐', 'envivos')"></i>
+                <i class="fas fa-clap" title="👏" onclick="addEmoji('👏', 'envivos')"></i>
+                <i class="fas fa-heart" title="❤️" onclick="addEmoji('❤️', 'envivos')"></i>
+                <i class="fas fa-laugh" title="😂" onclick="addEmoji('😂', 'envivos')"></i>
+            </div>
+            <button class="chat-send-btn" onclick="sendChatMessage('envivos')">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    `;
+    
+    envivosContainer.appendChild(chatContainer);
 }
+
+
+
+// Chat functionality
+function sendChatMessage(chatType) {
+    const inputId = `${chatType}ChatInput`;
+    const messagesId = `${chatType}ChatMessages`;
+    const input = document.getElementById(inputId);
+    const messages = document.getElementById(messagesId);
+    const messageText = input.value.trim();
+    
+    if (messageText === '') return;
+    
+    // Create new message
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'chat-message';
+    messageDiv.innerHTML = `
+        <span class="chat-user">Tú:</span>
+        <span class="chat-text">${messageText}</span>
+    `;
+    
+    // Add message to chat
+    messages.appendChild(messageDiv);
+    
+    // Scroll to bottom
+    messages.scrollTop = messages.scrollHeight;
+    
+    // Clear input
+    input.value = '';
+    
+    
+}
+
+function addEmoji(emoji, chatType) {
+    const inputId = `${chatType}ChatInput`;
+    const input = document.getElementById(inputId);
+    input.value += emoji;
+    input.focus();
+}
+
+function handleChatKeyPress(event, chatType) {
+    if (event.key === 'Enter') {
+        sendChatMessage(chatType);
+    }
+}
+
+
