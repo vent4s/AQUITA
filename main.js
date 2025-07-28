@@ -817,5 +817,3 @@ function handleChatKeyPress(event, chatType) {
         sendChatMessage(chatType);
     }
 }
-
-
