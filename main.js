@@ -55,7 +55,7 @@ const randomImages = [
 
 // URLs predefinidas para streaming (solo editables desde código)
 const streamingUrls = {
-    iptv: 'https://www.youtube.com/embed/jfKfPfyJRdk', // Cambia esta URL por la que desees
+    iptv: 'https://www.youtube.com/live/7pYp52T1LCg', // Cambia esta URL por la que desees
     deportes: 'https://www.youtube.com/embed/jfKfPfyJRdk', // Cambia esta URL por la que desees
     envivos: 'https://kick.com/samulx' // Cambia esta URL por la que desees
 };
